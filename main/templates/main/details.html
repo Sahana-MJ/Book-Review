@@ -1,0 +1,94 @@
+{%  extends 'main/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <br>
+    <div class="card">
+        <div class="card body">
+        <div class="row">
+
+
+            <div class="col-md-4">
+                <img src="{{ book.image }}" alt="{{ book.name }}" class="img-fluid">
+                <!-- <h3>{{ book.name }}</h3> -->
+            </div>
+            <div class="col-md-8" >
+                <h2 style="color: #ff0076;">
+                    {{ book.name }}
+                </h2>
+                <br>
+                <h6 class="text-center">
+
+                {{ book.description }}
+            </h6>
+            <h5>Author: {{ book.author }}</h5>
+            <br>
+            <h5>published year: {{ book.published_year }}</h5>
+            <br>
+            <h5>Rating: {{ average }}/10 </h5>
+
+            {% if request.user.is_authenticated %}
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'main:edit_books' book.id %}" class="btn btn-warning">Edit book</a>
+                    <a href="{% url 'main:delete_book' book.id %}" class="btn btn-danger"  onclick="return confirm('Are you sure to delete');">Delete book</a>
+                {% endif %}
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+    <br>
+
+    <div class="card">
+        <div class="card-body">
+           <h3 class="text-center"> Add Review</h3>
+           <form action=" {% url 'main:add_review' book.id %}" method="POST">
+                {% csrf_token %}
+                <label for="comment">Review</label>
+                <textarea name="comment" id="comment" cols="30" rows="6" class="form-control"></textarea>
+
+                <label for="rating">Rating</label>
+                <input type="range" id="rangeInput"
+                    name="rating" min="0" max="10" value="0" step="0.5"
+                    oninput="amount.value=rangeInput.value">
+                <output name="amount" id="amount" for="rangeInput">0</output>
+                
+
+                <br>
+                <input type="submit" class="btn btn-danger" value="Add Review">
+           </form>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-body">
+           <h3 class="text-center">Reviews</h3> 
+            {% for review in reviews %}
+                <div class="card" style="background-color:#c8e3ec;">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h5 class="text-left">{{ review.user.username }}</h5>
+                                <h5>{{ review.rating }}</h5>
+                                {% if request.user == review.user %}
+                                <a href="{% url 'main:edit_review' book.id review.id %}">Edit</a>
+                                <a href="{% url 'main:delete_review' book.id review.id %}" onclick="return confirm('Are you sure to delete');">Delete</a>
+                                {% endif %}
+
+                            </div>
+                            <div class="col-md-9">
+                                <p>{{ review.comment }}</p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>
+
+{%  endblock %} 
